@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TokenFun — Lanza tu Token en Segundos</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --g1: #00FF64;
+  --g2: #00C846;
+  --g3: #00FFB4;
+  --g4: #B4FF00;
+  --cy: #00FFDC;
+  --ng: #050805;
+  --ng2:#0A0F0A;
+  --ng3:#0F160F;
+  --ng4:#141E14;
+  --wh: #FFFFFF;
+  --cl: #8BA88B;
+  --gr: #3A4E3A;
+  --bd: rgba(0,255,100,.2);
+  --bd2:rgba(0,255,100,.08);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'Space Grotesk',sans-serif;background:var(--ng);color:var(--wh);overflow-x:hidden;}
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:var(--ng2);}
+::-webkit-scrollbar-thumb{background:var(--g2);border-radius:2px;}
+
+/* ── NAV ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:12px 40px;background:rgba(5,8,5,.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--bd2);}
+.nl{display:flex;align-items:center;gap:10px;}
+.nl img{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--g1);box-shadow:0 0 12px rgba(0,255,100,.4);}
+.nl-txt{font-family:'Space Mono',monospace;font-size:1.1rem;font-weight:700;color:var(--g1);letter-spacing:2px;}
+.nav-links{display:flex;gap:24px;align-items:center;}
+.nav-links a{color:var(--cl);font-size:.82rem;text-decoration:none;font-weight:500;transition:color .2s;}
+.nav-links a:hover{color:var(--g1);}
+.nav-cta{background:var(--g1);color:#000!important;padding:9px 20px;border-radius:6px;font-weight:700!important;font-size:.82rem!important;transition:all .2s!important;box-shadow:0 0 20px rgba(0,255,100,.3);}
+.nav-cta:hover{box-shadow:0 0 40px rgba(0,255,100,.6)!important;transform:translateY(-1px)!important;}
+
+/* ── TICKER ── */
+.ticker{background:var(--ng2);border-bottom:1px solid var(--bd2);padding:8px 0;overflow:hidden;white-space:nowrap;}
+.ticker-inner{display:inline-flex;gap:40px;animation:tickerMove 30s linear infinite;}
+.ticker-item{display:flex;align-items:center;gap:8px;font-family:'Space Mono',monospace;font-size:.75rem;}
+.ticker-name{color:var(--g1);font-weight:700;}
+.ticker-price{color:var(--wh);}
+.ticker-change.up{color:#00FF64;}
+.ticker-change.down{color:#FF4444;}
+@keyframes tickerMove{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* ── HERO ── */
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:120px 40px 80px;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(0,255,100,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,100,.04) 1px,transparent 1px);background-size:40px 40px;}
+.hero::after{content:'';position:absolute;top:10%;left:50%;transform:translateX(-50%);width:800px;height:800px;border-radius:50%;background:radial-gradient(circle,rgba(0,255,100,.07) 0%,transparent 65%);pointer-events:none;animation:heroGlow 5s ease-in-out infinite alternate;}
+@keyframes heroGlow{0%{opacity:.5;transform:translateX(-50%) scale(1);}100%{opacity:1;transform:translateX(-50%) scale(1.2);}}
+
+canvas#particles{position:absolute;inset:0;z-index:0;pointer-events:none;}
+
+.hero-logo{width:180px;height:180px;border-radius:50%;margin-bottom:24px;position:relative;z-index:1;animation:logoFloat 4s ease-in-out infinite;filter:drop-shadow(0 0 30px rgba(0,255,100,.5));}
+@keyframes logoFloat{0%,100%{transform:translateY(0);filter:drop-shadow(0 0 30px rgba(0,255,100,.5));}50%{transform:translateY(-12px);filter:drop-shadow(0 0 60px rgba(0,255,100,.8));}}
+
+.h-badge{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--bd);background:rgba(0,255,100,.06);padding:6px 16px;border-radius:20px;font-size:.72rem;font-weight:700;letter-spacing:2px;color:var(--g3);margin-bottom:16px;position:relative;z-index:1;font-family:'Space Mono',monospace;}
+.h-badge span{width:7px;height:7px;border-radius:50%;background:var(--g1);animation:blk 1.5s infinite;}
+@keyframes blk{0%,100%{opacity:1}50%{opacity:.2}}
+
+h1.ht{font-family:'Space Mono',monospace;font-size:clamp(2.2rem,5vw,4.5rem);font-weight:700;line-height:1.1;margin-bottom:16px;position:relative;z-index:1;}
+.ht .gr{color:var(--g1);text-shadow:0 0 30px rgba(0,255,100,.5);}
+.h-sub{font-size:1rem;color:var(--cl);max-width:540px;line-height:1.8;font-weight:400;margin-bottom:32px;position:relative;z-index:1;}
+
+.h-btns{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;position:relative;z-index:1;}
+.b-cta{background:var(--g1);color:#000;padding:14px 32px;border-radius:8px;font-weight:700;font-size:.95rem;letter-spacing:1px;border:none;cursor:pointer;text-decoration:none;transition:all .3s;box-shadow:0 0 28px rgba(0,255,100,.4);animation:pCta 2.5s ease-in-out infinite;font-family:'Space Grotesk',sans-serif;}
+@keyframes pCta{0%,100%{box-shadow:0 0 28px rgba(0,255,100,.4);}50%{box-shadow:0 0 60px rgba(0,255,100,.8);}}
+.b-cta:hover{transform:translateY(-2px);}
+.b-outline{border:1.5px solid var(--bd);color:var(--cl);padding:13px 28px;border-radius:8px;font-weight:500;font-size:.93rem;text-decoration:none;transition:all .3s;font-family:'Space Grotesk',sans-serif;}
+.b-outline:hover{border-color:var(--g1);color:var(--g1);}
+
+.h-stats{display:flex;gap:40px;margin-top:48px;flex-wrap:wrap;justify-content:center;position:relative;z-index:1;}
+.h-stat{text-align:center;}
+.h-stat-n{font-family:'Space Mono',monospace;font-size:1.8rem;font-weight:700;color:var(--g1);text-shadow:0 0 20px rgba(0,255,100,.4);}
+.h-stat-l{font-size:.7rem;color:var(--cl);letter-spacing:2px;margin-top:4px;}
+
+/* ── DIVIDER ── */
+.divider{width:100%;height:1px;background:linear-gradient(90deg,transparent,var(--g1),var(--g3),var(--g1),transparent);}
+
+/* ── TOKEN DESTACADO (TFN) ── */
+.featured-token{background:var(--ng2);border-top:1px solid var(--bd2);border-bottom:1px solid var(--bd2);padding:60px 0;}
+.ft-inner{max-width:1100px;margin:0 auto;padding:0 40px;}
+.sl{font-size:.68rem;letter-spacing:4px;color:var(--g1);text-transform:uppercase;margin-bottom:10px;font-weight:700;font-family:'Space Mono',monospace;}
+.st{font-family:'Space Mono',monospace;font-size:clamp(1.6rem,3vw,2.4rem);font-weight:700;line-height:1.2;margin-bottom:10px;}
+.grt{color:var(--g1);text-shadow:0 0 20px rgba(0,255,100,.3);}
+
+.token-card-featured{background:var(--ng3);border:1.5px solid var(--bd);border-radius:20px;padding:32px;margin-top:40px;display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center;box-shadow:0 0 60px rgba(0,255,100,.08);}
+.token-logo-big{width:120px;height:120px;border-radius:50%;background:linear-gradient(135deg,var(--ng3),var(--ng4));border:2px solid var(--g1);display:flex;align-items:center;justify-content:center;font-size:3rem;box-shadow:0 0 40px rgba(0,255,100,.3);animation:logoFloat 4s ease-in-out infinite;}
+.token-name{font-family:'Space Mono',monospace;font-size:2rem;font-weight:700;color:var(--g1);margin-bottom:4px;}
+.token-ticker{font-size:.85rem;color:var(--cl);letter-spacing:3px;margin-bottom:16px;font-family:'Space Mono',monospace;}
+.token-desc{font-size:.9rem;color:var(--cl);line-height:1.8;margin-bottom:20px;}
+.token-metrics{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px;}
+.tm{background:var(--ng4);border:1px solid var(--bd2);border-radius:10px;padding:12px;text-align:center;}
+.tm-val{font-family:'Space Mono',monospace;font-size:1rem;font-weight:700;color:var(--g1);}
+.tm-lbl{font-size:.65rem;color:var(--cl);letter-spacing:1px;margin-top:3px;}
+.progress-wrap{margin-bottom:16px;}
+.progress-label{display:flex;justify-content:space-between;font-size:.72rem;color:var(--cl);margin-bottom:6px;font-family:'Space Mono',monospace;}
+.progress-bar{height:8px;background:rgba(0,255,100,.1);border-radius:4px;overflow:hidden;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--g2),var(--g1),var(--g3));border-radius:4px;box-shadow:0 0 12px rgba(0,255,100,.4);transition:width 2s ease;}
+.btn-buy{width:100%;padding:14px;background:var(--g1);color:#000;border:none;border-radius:10px;font-weight:700;font-size:.95rem;letter-spacing:1px;cursor:pointer;font-family:'Space Grotesk',sans-serif;box-shadow:0 0 24px rgba(0,255,100,.4);transition:all .3s;animation:pCta 2.5s ease-in-out infinite;}
+.btn-buy:hover{transform:translateY(-2px);}
+
+/* Chart simulado */
+.chart-area{background:var(--ng4);border:1px solid var(--bd2);border-radius:14px;padding:20px;height:260px;position:relative;overflow:hidden;}
+.chart-title{font-size:.7rem;color:var(--g1);letter-spacing:2px;font-family:'Space Mono',monospace;margin-bottom:12px;}
+canvas#chart{width:100%;height:200px;}
+.chart-price{font-family:'Space Mono',monospace;font-size:1.4rem;font-weight:700;color:var(--g1);position:absolute;top:16px;right:20px;}
+.chart-change{font-size:.75rem;color:#00FF64;position:absolute;top:40px;right:20px;font-family:'Space Mono',monospace;}
+
+/* ── TOKENS GRID ── */
+section{padding:60px 40px;max-width:1100px;margin:0 auto;}
+.tokens-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;margin-top:32px;}
+.tcard{background:var(--ng2);border:1px solid var(--bd2);border-radius:14px;padding:20px;transition:all .3s;cursor:pointer;position:relative;overflow:hidden;}
+.tcard::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--g1),transparent);opacity:0;transition:opacity .3s;}
+.tcard:hover{border-color:var(--bd);transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,.5),0 0 20px rgba(0,255,100,.05);}
+.tcard:hover::before{opacity:1;}
+.tc-header{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+.tc-logo{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.3rem;border:1px solid var(--bd);background:var(--ng3);}
+.tc-name{font-family:'Space Mono',monospace;font-size:.95rem;font-weight:700;color:var(--g1);}
+.tc-ticker{font-size:.7rem;color:var(--cl);letter-spacing:1px;}
+.tc-desc{font-size:.78rem;color:var(--cl);line-height:1.6;margin-bottom:14px;}
+.tc-stats{display:flex;justify-content:space-between;font-size:.72rem;font-family:'Space Mono',monospace;}
+.tc-mcap{color:var(--wh);}
+.tc-change{color:var(--g1);}
+.tc-bar{height:4px;background:rgba(0,255,100,.1);border-radius:2px;margin-top:10px;overflow:hidden;}
+.tc-fill{height:100%;background:var(--g1);border-radius:2px;box-shadow:0 0 8px rgba(0,255,100,.4);}
+
+/* ── CÓMO FUNCIONA ── */
+.how-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:36px;}
+.how-card{background:var(--ng2);border:1px solid var(--bd2);border-radius:14px;padding:24px;text-align:center;transition:all .3s;}
+.how-card:hover{border-color:var(--bd);transform:translateY(-3px);}
+.how-num{font-family:'Space Mono',monospace;font-size:2rem;font-weight:700;color:var(--g1);margin-bottom:12px;text-shadow:0 0 20px rgba(0,255,100,.4);}
+.how-card h3{font-size:.95rem;font-weight:600;margin-bottom:8px;color:var(--wh);}
+.how-card p{font-size:.8rem;color:var(--cl);line-height:1.7;}
+
+/* ── LANZAMIENTO FORM ── */
+.launch-section{background:var(--ng2);border-top:1px solid var(--bd2);border-bottom:1px solid var(--bd2);padding:60px 0;}
+.launch-inner{max-width:600px;margin:0 auto;padding:0 40px;}
+.launch-form{background:var(--ng3);border:1.5px solid var(--bd);border-radius:20px;padding:36px;box-shadow:0 0 60px rgba(0,255,100,.06);}
+.lf-label{display:block;font-size:.68rem;font-weight:700;letter-spacing:2px;color:var(--g1);margin-bottom:6px;font-family:'Space Mono',monospace;}
+.lf-input{width:100%;padding:12px 14px;background:rgba(0,255,100,.04);border:1px solid var(--bd2);border-radius:8px;color:var(--wh);font-family:'Space Grotesk',sans-serif;font-size:.9rem;outline:none;transition:border-color .25s;margin-bottom:14px;}
+.lf-input:focus{border-color:var(--g1);box-shadow:0 0 0 3px rgba(0,255,100,.08);}
+.lf-input::placeholder{color:rgba(0,255,100,.25);}
+.lf-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.lf-btn{width:100%;padding:15px;background:var(--g1);color:#000;border:none;border-radius:10px;font-weight:700;font-size:.95rem;letter-spacing:1px;cursor:pointer;font-family:'Space Grotesk',sans-serif;box-shadow:0 0 24px rgba(0,255,100,.4);transition:all .3s;animation:pCta 2.5s ease-in-out infinite;margin-top:6px;}
+.lf-btn:hover{transform:translateY(-2px);}
+.lf-note{font-size:.7rem;color:var(--cl);text-align:center;margin-top:10px;line-height:1.6;}
+.lf-success{display:none;text-align:center;padding:20px;background:rgba(0,255,100,.06);border:1px solid var(--bd);border-radius:10px;margin-top:10px;color:var(--g3);font-size:.88rem;line-height:1.8;}
+
+/* ── LIVE FEED ── */
+.live-feed{background:var(--ng2);border-top:1px solid var(--bd2);padding:60px 0;}
+.lf-inner{max-width:1100px;margin:0 auto;padding:0 40px;}
+.live-list{display:flex;flex-direction:column;gap:8px;margin-top:24px;}
+.live-item{display:flex;align-items:center;gap:14px;padding:12px 16px;background:var(--ng3);border:1px solid var(--bd2);border-radius:10px;transition:all .25s;animation:liveIn .4s ease;}
+@keyframes liveIn{from{opacity:0;transform:translateX(-10px);}to{opacity:1;transform:translateX(0);}}
+.live-item:hover{border-color:var(--bd);}
+.li-logo{width:36px;height:36px;border-radius:50%;background:var(--ng4);border:1px solid var(--bd2);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;}
+.li-name{font-family:'Space Mono',monospace;font-size:.82rem;font-weight:700;color:var(--g1);}
+.li-desc{font-size:.75rem;color:var(--cl);}
+.li-price{font-family:'Space Mono',monospace;font-size:.82rem;color:var(--wh);margin-left:auto;}
+.li-change{font-family:'Space Mono',monospace;font-size:.75rem;color:var(--g1);min-width:50px;text-align:right;}
+.live-dot{width:8px;height:8px;border-radius:50%;background:var(--g1);animation:blk 1s infinite;flex-shrink:0;}
+
+/* ── FOOTER ── */
+footer{background:var(--ng2);border-top:1px solid var(--bd2);padding:40px;text-align:center;}
+.footer-logo{font-family:'Space Mono',monospace;font-size:1.2rem;font-weight:700;color:var(--g1);margin-bottom:8px;text-shadow:0 0 20px rgba(0,255,100,.3);}
+footer p{font-size:.75rem;color:var(--cl);line-height:1.8;}
+footer a{color:var(--g1);text-decoration:none;}
+
+/* ── GREEN STRIP ── */
+.gstrip{height:3px;background:linear-gradient(90deg,var(--ng),var(--g1),var(--g3),var(--g1),var(--ng));animation:stripMove 3s linear infinite;background-size:200% auto;}
+@keyframes stripMove{0%{background-position:0%}100%{background-position:200%}}
+
+@media(max-width:768px){
+  nav{padding:10px 16px;} .nav-links{display:none;}
+  section,.ft-inner,.launch-inner,.lf-inner{padding:40px 16px;}
+  .token-card-featured{grid-template-columns:1fr;}
+  .lf-row{grid-template-columns:1fr;}
+  h1.ht{font-size:2rem;}
+}
+</style>
+</head>
+<body>
+
+<!-- VIDEO MODAL AUTO-PLAY -->
+<div id="videoModal" style="position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.92);display:flex;align-items:center;justify-content:center;animation:fadeIn .4s ease;">
+  <div style="position:relative;width:90%;max-width:800px;">
+    <!-- Botón cerrar -->
+    <button onclick="closeVideo()" style="position:absolute;top:-44px;right:0;background:rgba(255,200,0,.15);border:1.5px solid rgba(255,200,0,.4);color:#FFD200;width:36px;height:36px;border-radius:50%;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;font-family:sans-serif;" onmouseover="this.style.background='rgba(255,200,0,.3)'" onmouseout="this.style.background='rgba(255,200,0,.15)'">✕</button>
+    <!-- Título -->
+    <div style="text-align:center;margin-bottom:14px;">
+      <span style="font-family:Space Mono,monospace;font-size:.72rem;letter-spacing:3px;color:#00FF64;font-weight:700;">🔴 VIDEO DE PRESENTACIÓN</span>
+    </div>
+    <!-- Video -->
+    <div style="position:relative;padding-bottom:56.25%;height:0;border-radius:12px;overflow:hidden;border:1.5px solid rgba(0,255,100,.2);box-shadow:0 0 60px rgba(0,255,100,.1);">
+      <iframe id="ytPlayer"
+        src="https://www.youtube.com/embed/yiQvmvKn9w4?autoplay=1&mute=0&rel=0&modestbranding=1&color=white"
+        style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;"
+        allow="autoplay; encrypted-media"
+        allowfullscreen>
+      </iframe>
+    </div>
+    <!-- Skip -->
+    <div style="text-align:center;margin-top:14px;">
+      <button onclick="closeVideo()" style="background:transparent;border:none;color:rgba(0,255,100,.5);font-size:.75rem;cursor:pointer;font-family:Space Grotesk,sans-serif;letter-spacing:1px;transition:color .2s;" onmouseover="this.style.color='#00FF64'" onmouseout="this.style.color='rgba(0,255,100,.5)'">
+        Saltar video →
+      </button>
+    </div>
+  </div>
+</div>
+
+<style>
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+</style>
+
+<script>
+function closeVideo(){
+  const modal = document.getElementById('videoModal');
+  modal.style.animation = 'none';
+  modal.style.opacity = '0';
+  modal.style.transition = 'opacity .3s ease';
+  setTimeout(()=>{
+    modal.style.display = 'none';
+    // Detener video al cerrar
+    const iframe = document.getElementById('ytPlayer');
+    iframe.src = iframe.src;
+  }, 300);
+}
+// Cerrar con tecla ESC
+document.addEventListener('keydown', e => {
+  if(e.key === 'Escape') closeVideo();
+});
+// Cerrar al hacer clic fuera del video
+document.getElementById('videoModal').addEventListener('click', function(e){
+  if(e.target === this) closeVideo();
+});
+</script>
+
+
+<div class="gstrip"></div>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-inner" id="ticker">
+    <div class="ticker-item"><span class="ticker-name">TFN</span><span class="ticker-price">$0.00042</span><span class="ticker-change up">+124.5%</span></div>
+    <div class="ticker-item"><span class="ticker-name">MEME</span><span class="ticker-price">$0.00018</span><span class="ticker-change up">+87.2%</span></div>
+    <div class="ticker-item"><span class="ticker-name">LUNA2</span><span class="ticker-price">$0.00091</span><span class="ticker-change down">-12.4%</span></div>
+    <div class="ticker-item"><span class="ticker-name">PEPE2</span><span class="ticker-price">$0.00034</span><span class="ticker-change up">+256.8%</span></div>
+    <div class="ticker-item"><span class="ticker-name">DOGE3</span><span class="ticker-price">$0.00007</span><span class="ticker-change up">+45.1%</span></div>
+    <div class="ticker-item"><span class="ticker-name">SHIB2</span><span class="ticker-price">$0.00002</span><span class="ticker-change down">-8.3%</span></div>
+    <div class="ticker-item"><span class="ticker-name">SOLMX</span><span class="ticker-price">$0.00156</span><span class="ticker-change up">+312.7%</span></div>
+    <div class="ticker-item"><span class="ticker-name">TFN</span><span class="ticker-price">$0.00042</span><span class="ticker-change up">+124.5%</span></div>
+    <div class="ticker-item"><span class="ticker-name">MEME</span><span class="ticker-price">$0.00018</span><span class="ticker-change up">+87.2%</span></div>
+    <div class="ticker-item"><span class="ticker-name">LUNA2</span><span class="ticker-price">$0.00091</span><span class="ticker-change down">-12.4%</span></div>
+    <div class="ticker-item"><span class="ticker-name">PEPE2</span><span class="ticker-price">$0.00034</span><span class="ticker-change up">+256.8%</span></div>
+    <div class="ticker-item"><span class="ticker-name">DOGE3</span><span class="ticker-price">$0.00007</span><span class="ticker-change up">+45.1%</span></div>
+    <div class="ticker-item"><span class="ticker-name">SHIB2</span><span class="ticker-price">$0.00002</span><span class="ticker-change down">-8.3%</span></div>
+    <div class="ticker-item"><span class="ticker-name">SOLMX</span><span class="ticker-price">$0.00156</span><span class="ticker-change up">+312.7%</span></div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div class="nl">
+    <img src="data:image/jpeg;base64,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" alt="TokenFun"/>
+    <span class="nl-txt">TokenFun</span>
+  </div>
+  <div class="nav-links">
+    <a href="#tokens">Tokens</a>
+    <a href="#como-funciona">Cómo funciona</a>
+    <a href="#lanzar">Lanzar Token</a>
+    <a href="#lanzar" class="nav-cta">🚀 Crear Token</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <canvas id="particles"></canvas>
+  <img class="hero-logo" src="data:image/jpeg;base64,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" alt="TokenFun"/>
+  <div class="h-badge"><span></span> PLATAFORMA DESCENTRALIZADA · INTERNACIONAL</div>
+  <h1 class="ht">Lanza tu <span class="gr">Token</span><br>en Segundos</h1>
+  <p class="h-sub">TokenFun es la plataforma más rápida para crear, lanzar y tradear tokens. Sin código, sin complicaciones — solo ideas que se convierten en realidad cripto.</p>
+  <div class="h-btns">
+    <a href="#lanzar" class="b-cta">🚀 Lanzar mi Token</a>
+    <a href="#tokens" class="b-outline">Ver Tokens Trending</a>
+  </div>
+  <div class="h-stats">
+    <div class="h-stat"><div class="h-stat-n">12,847</div><div class="h-stat-l">TOKENS LANZADOS</div></div>
+    <div class="h-stat"><div class="h-stat-n">$4.2M</div><div class="h-stat-l">VOLUMEN 24H</div></div>
+    <div class="h-stat"><div class="h-stat-n">89,421</div><div class="h-stat-l">TRADERS ACTIVOS</div></div>
+    <div class="h-stat"><div class="h-stat-n">0.5%</div><div class="h-stat-l">FEE TOTAL</div></div>
+  </div>
+</div>
+
+<div class="gstrip"></div>
+
+<!-- TOKEN DESTACADO TFN -->
+<div class="featured-token">
+  <div class="ft-inner">
+    <div class="sl">🌟 TOKEN DESTACADO</div>
+    <h2 class="st">TokenFun Coin <span class="grt">TFN</span> — Token Oficial</h2>
+    <div class="token-card-featured">
+      <div>
+        <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;">
+          <div class="token-logo-big">🚀</div>
+          <div>
+            <div class="token-name">TokenFun Coin</div>
+            <div class="token-ticker">$TFN · Solana Network</div>
+          </div>
+        </div>
+        <p class="token-desc">El token oficial de la plataforma TokenFun. Holders de TFN reciben descuentos en fees, acceso anticipado a nuevos lanzamientos y participación en la gobernanza de la plataforma. Lanzado con fair launch — sin preventa, sin insiders.</p>
+        <div class="token-metrics">
+          <div class="tm"><div class="tm-val">$420K</div><div class="tm-lbl">MARKET CAP</div></div>
+          <div class="tm"><div class="tm-val">$84K</div><div class="tm-lbl">VOLUMEN 24H</div></div>
+          <div class="tm"><div class="tm-val">+124%</div><div class="tm-lbl">24H CHANGE</div></div>
+        </div>
+        <div class="progress-wrap">
+          <div class="progress-label"><span>Bonding curve</span><span id="bcPct">68%</span></div>
+          <div class="progress-bar"><div class="progress-fill" id="bcFill" style="width:0%"></div></div>
+        </div>
+        <button class="btn-buy" onclick="alert('Función de compra disponible próximamente. Regístrate para acceso anticipado.')">💚 Comprar TFN</button>
+      </div>
+      <div class="chart-area">
+        <div class="chart-title">TFN/USD · 24H</div>
+        <div class="chart-price" id="chartPrice">$0.00042</div>
+        <div class="chart-change" id="chartChange">+124.5% ↑</div>
+        <canvas id="chart"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOKENS TRENDING -->
+<section id="tokens">
+  <div class="sl">🔥 TRENDING AHORA</div>
+  <h2 class="st">Tokens <span class="grt">en Alza</span></h2>
+  <div class="tokens-grid">
+    <div class="tcard"><div class="tc-header"><div class="tc-logo">🚀</div><div><div class="tc-name">TFN</div><div class="tc-ticker">TokenFun Coin</div></div></div><p class="tc-desc">Token oficial de la plataforma. Holders reciben beneficios exclusivos y governance.</p><div class="tc-stats"><span class="tc-mcap">MC: $420K</span><span class="tc-change">+124% 🔥</span></div><div class="tc-bar"><div class="tc-fill" style="width:68%"></div></div></div>
+    <div class="tcard"><div class="tc-header"><div class="tc-logo">🌙</div><div><div class="tc-name">LUNAFUN</div><div class="tc-ticker">Luna Fun Token</div></div></div><p class="tc-desc">Meme token inspirado en el ecosistema lunar. Comunidad activa de 5,000+ holders.</p><div class="tc-stats"><span class="tc-mcap">MC: $89K</span><span class="tc-change">+312% 🚀</span></div><div class="tc-bar"><div class="tc-fill" style="width:82%"></div></div></div>
+    <div class="tcard"><div class="tc-header"><div class="tc-logo">🐸</div><div><div class="tc-name">FROGMX</div><div class="tc-ticker">Frog Mexico</div></div></div><p class="tc-desc">El primer meme token mexicano en TokenFun. Viral en comunidades LATAM.</p><div class="tc-stats"><span class="tc-mcap">MC: $156K</span><span class="tc-change">+87% 📈</span></div><div class="tc-bar"><div class="tc-fill" style="width:54%"></div></div></div>
+    <div class="tcard"><div class="tc-header"><div class="tc-logo">⚡</div><div><div class="tc-name">ZAPTOKEN</div><div class="tc-ticker">Zap Speed Token</div></div></div><p class="tc-desc">Token de utilidad para transacciones ultra-rápidas en la red TokenFun.</p><div class="tc-stats"><span class="tc-mcap">MC: $234K</span><span class="tc-change">+45% ⚡</span></div><div class="tc-bar"><div class="tc-fill" style="width:42%"></div></div></div>
+    <div class="tcard"><div class="tc-header"><div class="tc-logo">🦁</div><div><div class="tc-name">LIONLATAM</div><div class="tc-ticker">Lion LATAM</div></div></div><p class="tc-desc">Representando la fuerza de Latinoamérica en el mundo cripto. Fair launch.</p><div class="tc-stats"><span class="tc-mcap">MC: $67K</span><span class="tc-change">+198% 🦁</span></div><div class="tc-bar"><div class="tc-fill" style="width:29%"></div></div></div>
+    <div class="tcard"><div class="tc-header"><div class="tc-logo">💎</div><div><div class="tc-name">DIAMONDX</div><div class="tc-ticker">Diamond X Token</div></div></div><p class="tc-desc">Token premium para inversores serios. Supply limitado de 1B tokens. Deflacionario.</p><div class="tc-stats"><span class="tc-mcap">MC: $512K</span><span class="tc-change">+56% 💎</span></div><div class="tc-bar"><div class="tc-fill" style="width:91%"></div></div></div>
+  </div>
+</section>
+
+<div class="gstrip"></div>
+
+
+<!-- VIDEO YOUTUBE TOKENFUN -->
+<section style="text-align:center;padding:60px 40px;max-width:1100px;margin:0 auto;">
+  <div class="sl" style="text-align:center">🎬 VER EN ACCIÓN</div>
+  <h2 class="st" style="text-align:center;margin-bottom:24px;">Descubre cómo <span class="grt">funciona</span></h2>
+  <div style="max-width:700px;margin:0 auto;border-radius:16px;overflow:hidden;border:1.5px solid var(--bd);box-shadow:0 0 40px rgba(0,255,100,.08);">
+    <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;">
+      <iframe
+        src="https://www.youtube.com/embed/yiQvmvKn9w4?rel=0&showinfo=0"
+        style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowfullscreen>
+      </iframe>
+    </div>
+  </div>
+  <p style="color:var(--cl);font-size:.88rem;margin-top:16px;">👆 Mira cómo lanzar tu token en segundos con TokenFun</p>
+</section>
+<div class="gstrip"></div>
+<!-- CÓMO FUNCIONA -->
+<section id="como-funciona">
+  <div class="sl">⚡ SIMPLE Y RÁPIDO</div>
+  <h2 class="st">¿Cómo <span class="grt">funciona</span>?</h2>
+  <div class="how-grid">
+    <div class="how-card"><div class="how-num">01</div><h3>Crea tu Token</h3><p>Define nombre, símbolo, supply y descripción. Sin código, sin conocimientos técnicos requeridos.</p></div>
+    <div class="how-card"><div class="how-num">02</div><h3>Lanza al Mercado</h3><p>Tu token se lista automáticamente con una bonding curve. El precio sube conforme más personas compran.</p></div>
+    <div class="how-card"><div class="how-num">03</div><h3>Construye Comunidad</h3><p>Comparte en redes sociales, crea telegram, atrae holders. La comunidad es el motor de cualquier token.</p></div>
+    <div class="how-card"><div class="how-num">04</div><h3>Gradúa a DEX</h3><p>Cuando tu token alcanza $69K de market cap migra automáticamente a un exchange descentralizado.</p></div>
+  </div>
+</section>
+
+<!-- LIVE FEED -->
+<div class="live-feed">
+  <div class="lf-inner">
+    <div class="sl">🔴 EN VIVO</div>
+    <h2 class="st">Actividad <span class="grt">en Tiempo Real</span></h2>
+    <div class="live-list" id="liveList"></div>
+  </div>
+</div>
+
+<!-- LANZAR TOKEN -->
+<div class="launch-section" id="lanzar">
+  <div class="launch-inner">
+    <div class="sl" style="text-align:center">🚀 LANZA AHORA</div>
+    <h2 class="st" style="text-align:center;margin-bottom:8px;">Crea tu <span class="grt">Token</span></h2>
+    <p style="text-align:center;color:var(--cl);font-size:.88rem;margin-bottom:28px;">Completa el formulario y lanza tu token en menos de 60 segundos</p>
+    <div class="launch-form">
+      <form onsubmit="launchToken(event)">
+        <div class="lf-row">
+          <div>
+            <label class="lf-label">NOMBRE DEL TOKEN</label>
+            <input class="lf-input" type="text" placeholder="Ej: MiToken Coin" required/>
+          </div>
+          <div>
+            <label class="lf-label">SÍMBOLO / TICKER</label>
+            <input class="lf-input" type="text" placeholder="Ej: MTC" maxlength="6" required/>
+          </div>
+        </div>
+        <label class="lf-label">DESCRIPCIÓN</label>
+        <textarea class="lf-input" placeholder="Describe tu token y su utilidad..." rows="3" style="resize:vertical;" required></textarea>
+        <div class="lf-row">
+          <div>
+            <label class="lf-label">SUPPLY TOTAL</label>
+            <input class="lf-input" type="text" placeholder="1,000,000,000" required/>
+          </div>
+          <div>
+            <label class="lf-label">TU EMAIL</label>
+            <input class="lf-input" type="email" placeholder="tu@email.com" required/>
+          </div>
+        </div>
+        <label class="lf-label">WEBSITE / REDES SOCIALES (opcional)</label>
+        <input class="lf-input" type="text" placeholder="https://tutoken.com o @tutoken"/>
+        <button type="submit" class="lf-btn">🚀 LANZAR MI TOKEN AHORA →</button>
+        <p class="lf-note">🔒 Fee de lanzamiento: 0.02 SOL (~$3 USD) · Sin preventa · Fair launch garantizado</p>
+      </form>
+      <div class="lf-success" id="launchSuccess">
+        🎉 ¡Tu token está siendo procesado!<br>
+        Recibirás un email con los detalles de tu lanzamiento en menos de 5 minutos.<br>
+        <strong style="color:var(--g1)">¡Bienvenido a TokenFun! 🚀</strong>
+      </div>
+    </div>
+  
+<div style="margin-top:20px;text-align:center;">
+  <div style="font-size:.72rem;font-weight:700;letter-spacing:2px;color:var(--g1);margin-bottom:12px;font-family:'Space Mono',monospace;">💳 PAGO SEGURO — LANZA TU TOKEN HOY</div>
+  <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=asesorespatrimonialesaxa@gmail.com&item_name=TokenFun+Lanzamiento+de+Token&amount=50.00&currency_code=USD&return=https://elitemusic357-lang.github.io/tokenfun&cancel_return=https://elitemusic357-lang.github.io/tokenfun" target="_blank" style="display:inline-block;padding:16px 40px;background:linear-gradient(135deg,#003087,#009cde);color:#fff;border-radius:10px;font-weight:700;font-size:1rem;text-decoration:none;box-shadow:0 4px 24px rgba(0,156,222,.5);transition:all .3s;letter-spacing:1px;">
+    💳 PAGAR $50 USD CON PAYPAL →
+  </a>
+  <p style="font-size:.7rem;color:var(--cl);margin-top:10px;">🔒 Pago único por lanzamiento · Acceso en menos de 5 minutos · Soporte incluido</p>
+</div>
+</div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">TokenFun</div>
+  <p>© 2026 TokenFun — Plataforma Internacional de Lanzamiento de Tokens</p>
+  <p style="margin-top:4px">🌎 Internacional · ⚡ Descentralizado · 🔒 Seguro</p>
+  <p style="margin-top:8px;font-size:.68rem">TokenFun es una plataforma de tecnología. No somos asesores financieros. Invertir en criptomonedas conlleva riesgos. DYOR.</p>
+</footer>
+
+<div class="gstrip"></div>
+
+<script>
+// PARTÍCULAS
+const cv = document.getElementById('particles');
+const ctx = cv.getContext('2d');
+function resize(){cv.width=innerWidth;cv.height=innerHeight;}
+resize(); window.addEventListener('resize',resize);
+const pcols=['rgba(0,255,100,','rgba(0,255,220,','rgba(180,255,0,'];
+const parts=[];
+class P{
+  constructor(){this.r();}
+  r(){this.x=Math.random()*innerWidth;this.y=Math.random()*innerHeight;this.s=Math.random()*2+.3;this.vx=(Math.random()-.5)*.5;this.vy=-(Math.random()*.6+.1);this.c=pcols[Math.floor(Math.random()*pcols.length)];this.a=0;this.ma=Math.random()*.5+.1;this.g=true;}
+  u(){this.x+=this.vx;this.y+=this.vy;if(this.g){this.a+=.012;if(this.a>=this.ma)this.g=false;}else{this.a-=.018;if(this.a<=0||this.y<-10)this.r();}}
+  d(){ctx.beginPath();ctx.arc(this.x,this.y,this.s,0,Math.PI*2);ctx.fillStyle=this.c+this.a+')';ctx.fill();}
+}
+for(let i=0;i<120;i++)parts.push(new P());
+function anim(){ctx.clearRect(0,0,cv.width,cv.height);parts.forEach(p=>{p.u();p.d();});requestAnimationFrame(anim);}
+anim();
+
+// BONDING CURVE ANIMATION
+setTimeout(()=>{document.getElementById('bcFill').style.width='68%';},600);
+
+// CHART SIMULADO
+const chartCv = document.getElementById('chart');
+const chartCtx = chartCv.getContext('2d');
+chartCv.width = chartCv.offsetWidth || 300;
+chartCv.height = 180;
+const prices = [];
+let basePrice = 0.00020;
+for(let i=0;i<60;i++){
+  basePrice += (Math.random()-.3)*0.000008;
+  if(basePrice<0.00001)basePrice=0.00001;
+  prices.push(basePrice);
+}
+function drawChart(){
+  const w=chartCv.width, h=chartCv.height;
+  chartCtx.clearRect(0,0,w,h);
+  const min=Math.min(...prices)*0.95;
+  const max=Math.max(...prices)*1.05;
+  const scaleY=h/(max-min);
+  const scaleX=w/(prices.length-1);
+  // Gradiente área
+  const grd=chartCtx.createLinearGradient(0,0,0,h);
+  grd.addColorStop(0,'rgba(0,255,100,.2)');
+  grd.addColorStop(1,'rgba(0,255,100,0)');
+  chartCtx.beginPath();
+  chartCtx.moveTo(0,h);
+  prices.forEach((p,i)=>{chartCtx.lineTo(i*scaleX,h-(p-min)*scaleY);});
+  chartCtx.lineTo(w,h);
+  chartCtx.closePath();
+  chartCtx.fillStyle=grd;
+  chartCtx.fill();
+  // Línea
+  chartCtx.beginPath();
+  chartCtx.strokeStyle='#00FF64';
+  chartCtx.lineWidth=2;
+  chartCtx.shadowColor='#00FF64';
+  chartCtx.shadowBlur=8;
+  prices.forEach((p,i)=>{i===0?chartCtx.moveTo(0,h-(p-min)*scaleY):chartCtx.lineTo(i*scaleX,h-(p-min)*scaleY);});
+  chartCtx.stroke();
+}
+drawChart();
+// Actualizar precio cada 2 segundos
+setInterval(()=>{
+  prices.shift();
+  const last=prices[prices.length-1];
+  const newP=last+(Math.random()-.4)*0.000008;
+  prices.push(Math.max(0.00001,newP));
+  drawChart();
+  const cur=prices[prices.length-1];
+  document.getElementById('chartPrice').textContent='$'+cur.toFixed(5);
+},2000);
+
+// LIVE FEED
+const liveItems=[
+  {logo:'🚀',name:'TFN',action:'compró',amount:'$420',user:'0x4f2a...'},
+  {logo:'🌙',name:'LUNAFUN',action:'lanzó',amount:'',user:'CryptoMX'},
+  {logo:'🐸',name:'FROGMX',action:'vendió',amount:'$89',user:'0x9b1c...'},
+  {logo:'⚡',name:'ZAPTOKEN',action:'compró',amount:'$1,240',user:'TradeLATAM'},
+  {logo:'🦁',name:'LIONLATAM',action:'lanzó',amount:'',user:'LeonFund'},
+  {logo:'💎',name:'DIAMONDX',action:'compró',amount:'$5,000',user:'0x7e3f...'},
+  {logo:'🎯',name:'AIMTOKEN',action:'lanzó',amount:'',user:'StartupMX'},
+  {logo:'🌊',name:'WAVECOIN',action:'compró',amount:'$340',user:'Crypto_MX'},
+];
+let liveIdx=0;
+function addLiveItem(){
+  const item=liveItems[liveIdx%liveItems.length];
+  liveIdx++;
+  const list=document.getElementById('liveList');
+  const div=document.createElement('div');
+  div.className='live-item';
+  const timeAgo=Math.floor(Math.random()*59)+1;
+  div.innerHTML=`
+    <div class="live-dot"></div>
+    <div class="li-logo">${item.logo}</div>
+    <div><div class="li-name">${item.name}</div><div class="li-desc">${item.user} ${item.action} ${item.amount}</div></div>
+    <div class="li-price">hace ${timeAgo}s</div>
+    <div class="li-change">+${(Math.random()*200+10).toFixed(1)}%</div>
+  `;
+  list.insertBefore(div, list.firstChild);
+  if(list.children.length>8) list.removeChild(list.lastChild);
+}
+// Poblar inicial
+for(let i=0;i<6;i++) addLiveItem();
+setInterval(addLiveItem, 3000);
+
+// LAUNCH FORM
+function launchToken(e){
+  e.preventDefault();
+  const btn=e.target.querySelector('.lf-btn');
+  btn.textContent='⏳ Procesando...';
+  btn.disabled=true;
+  setTimeout(()=>{
+    e.target.style.display='none';
+    document.getElementById('launchSuccess').style.display='block';
+  },2000);
+}
+
+// NAV scroll
+window.addEventListener('scroll',()=>{
+  document.querySelector('nav').style.padding=scrollY>50?'8px 40px':'12px 40px';
+});
+
+// STATS counter animation
+const stats=[
+  {el:document.querySelector('.h-stat-n'),target:12847,suffix:''},
+];
+</script>
+
+<!-- CHATBOT TOKENFUN 24/7 -->
+<div id="tf-fab" onclick="toggleTFChat()" style="
+  position:fixed;bottom:24px;right:24px;z-index:9999;
+  width:62px;height:62px;border-radius:50%;cursor:pointer;
+  background:linear-gradient(135deg,#00C846,#00FF64);
+  box-shadow:0 6px 28px rgba(0,255,100,.55);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.6rem;animation:fabPulse 2.5s ease-in-out infinite;">🚀</div>
+
+<div id="tf-chat" style="display:none;position:fixed;bottom:100px;right:24px;z-index:9998;
+  width:340px;max-height:520px;background:#0A0F0A;
+  border:1.5px solid rgba(0,255,100,.3);border-radius:18px;overflow:hidden;
+  box-shadow:0 20px 60px rgba(0,0,0,.8),0 0 40px rgba(0,255,100,.1);
+  flex-direction:column;">
+  <!-- Header -->
+  <div style="background:linear-gradient(135deg,#005a20,#00C846,#00FF64);padding:14px 18px;display:flex;align-items:center;gap:10px;position:relative;overflow:hidden;">
+    <div style="width:38px;height:38px;border-radius:50%;background:rgba(0,0,0,.3);border:2px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;font-size:1.1rem;">🚀</div>
+    <div style="flex:1;">
+      <div style="font-family:'Space Mono',monospace;font-size:.85rem;font-weight:700;color:#000;">TokenFun Bot</div>
+      <div style="font-size:.65rem;color:rgba(0,0,0,.65);">Soporte de lanzamiento · 24/7</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:4px;font-size:.65rem;font-weight:700;color:#000;">
+      <span style="width:6px;height:6px;border-radius:50%;background:#00ff88;animation:blk 1.5s infinite;"></span> EN LÍNEA
+    </div>
+    <button onclick="toggleTFChat()" style="background:rgba(0,0,0,.2);border:none;border-radius:50%;width:26px;height:26px;cursor:pointer;color:#000;font-size:.85rem;">✕</button>
+  </div>
+  <!-- Mensajes -->
+  <div id="tf-messages" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;max-height:300px;"></div>
+  <!-- Opciones -->
+  <div id="tf-options" style="padding:8px 14px;display:flex;flex-direction:column;gap:6px;"></div>
+  <!-- Input -->
+  <div style="padding:10px 14px;border-top:1px solid rgba(0,255,100,.15);display:flex;gap:8px;">
+    <input id="tf-input" placeholder="Escribe tu pregunta..." onkeypress="if(event.key==='Enter')tfSend()"
+      style="flex:1;padding:9px 12px;background:rgba(0,255,100,.06);border:1px solid rgba(0,255,100,.2);border-radius:8px;color:#fff;font-family:'Space Grotesk',sans-serif;font-size:.83rem;outline:none;"/>
+    <button onclick="tfSend()" style="background:linear-gradient(135deg,#00C846,#00FF64);border:none;border-radius:8px;padding:9px 14px;cursor:pointer;font-size:.9rem;">➤</button>
+  </div>
+</div>
+
+<style>
+#tf-chat{display:none;}
+#tf-chat.open{display:flex!important;}
+.tf-msg{max-width:85%;padding:10px 14px;border-radius:12px;font-size:.83rem;line-height:1.6;animation:msgIn .3s ease;}
+.tf-bot{background:#141E14;border:1px solid rgba(0,255,100,.15);color:#8BA88B;border-radius:12px 12px 12px 3px;align-self:flex-start;}
+.tf-user{background:linear-gradient(135deg,#005a20,#00C846);color:#000;font-weight:600;border-radius:12px 12px 3px 12px;align-self:flex-end;}
+.tf-opt{padding:8px 14px;border:1px solid rgba(0,255,100,.25);border-radius:8px;background:rgba(0,255,100,.04);color:#8BA88B;font-size:.78rem;cursor:pointer;transition:all .2s;text-align:left;font-family:'Space Grotesk',sans-serif;}
+.tf-opt:hover{background:rgba(0,255,100,.12);border-color:var(--g1);color:#00FF64;}
+.tf-typing{display:flex;gap:4px;align-items:center;padding:8px 14px;}
+.tf-typing span{width:7px;height:7px;border-radius:50%;background:#00FF64;animation:typDot 1.4s infinite;}
+.tf-typing span:nth-child(2){animation-delay:.2s;}
+.tf-typing span:nth-child(3){animation-delay:.4s;}
+</style>
+
+<script>
+const TF_PAYPAL = "https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=asesorespatrimonialesaxa@gmail.com&item_name=TokenFun+Lanzamiento+de+Token&amount=50.00&currency_code=USD&return=https://elitemusic357-lang.github.io/tokenfun&cancel_return=https://elitemusic357-lang.github.io/tokenfun";
+let tfOpen=false, tfMsgs=0;
+
+const tfR={
+  bienvenida:{msg:`¡Hola! 👋 Soy el asistente de <strong style="color:#00FF64">TokenFun</strong> 🚀<br><br>¿En qué puedo ayudarte hoy?`,opts:['🪙 ¿Cómo lanzo mi token?','💰 ¿Cuánto cuesta?','🔒 ¿Es seguro?','📈 ¿Cómo funciona TFN?']},
+  como:{msg:`🚀 Lanzar tu token en TokenFun es muy fácil:<br><br>1️⃣ Completa el formulario con nombre y símbolo<br>2️⃣ Realiza el pago de <strong style="color:#00FF64">$50 USD</strong> vía PayPal<br>3️⃣ Tu token se lista en la plataforma en minutos<br>4️⃣ Comparte con tu comunidad y empieza a tradear`,opts:['💳 Quiero lanzar ahora','💰 ¿Qué incluye?','❓ ¿Necesito experiencia?']},
+  precio:{msg:`💰 El costo de lanzamiento es:<br><br>✦ <strong style="color:#00FF64">$50 USD — pago único</strong><br><br>Incluye:<br>✅ Listado en la plataforma<br>✅ Bonding curve automática<br>✅ Página de tu token<br>✅ Soporte de lanzamiento<br>✅ Migración a DEX al llegar a $69K market cap`,opts:['💳 Pagar ahora','🔒 ¿Es seguro el pago?','📈 ¿Cómo sube el precio?']},
+  seguro:{msg:`🔒 Tu pago es 100% seguro.<br><br>✦ Procesamos vía <strong style="color:#009cde">PayPal</strong> — el sistema más confiable del mundo<br>✦ Protección al comprador incluida<br>✦ Transacción encriptada SSL<br><br>TokenFun es una plataforma seria y transparente. 💚`,opts:['💳 Pagar con PayPal','❓ ¿Qué es TokenFun?','📞 Contactar soporte']},
+  tfn:{msg:`📈 <strong style="color:#00FF64">TokenFun Coin (TFN)</strong> es el token oficial de la plataforma.<br><br>✦ Holders reciben descuentos en fees<br>✦ Acceso anticipado a nuevos lanzamientos<br>✦ Voto en gobernanza de la plataforma<br>✦ Fair launch — sin preventa ni insiders<br><br>Market cap actual: <strong style="color:#00FF64">$420K</strong> · +124% en 24h 🚀`,opts:['💳 Comprar TFN','🪙 Lanzar mi token','💰 Ver precio']},
+  experiencia:{msg:`✅ ¡No necesitas experiencia técnica!<br><br>TokenFun está diseñado para que cualquier persona pueda lanzar su token:<br><br>✦ Sin código<br>✦ Sin conocimientos de blockchain<br>✦ Solo llena el formulario y paga<br><br>Nuestro equipo hace todo el trabajo técnico por ti. 🚀`,opts:['💳 Lanzar ahora','💰 ¿Cuánto cuesta?','📞 Hablar con alguien']},
+  pagar:{msg:`🎉 ¡Excelente decisión!<br><br>Haz clic en el botón de PayPal para completar tu pago de <strong style="color:#00FF64">$50 USD</strong>.<br><br>Tu token será listado en <strong style="color:#00FF64">menos de 5 minutos</strong> después de confirmar el pago. 🚀`,opts:[],paypal:true},
+  contacto:{msg:`📞 Contacta directamente a nuestro equipo:<br><br>✦ <strong style="color:#00FF64">WhatsApp:</strong> 861 200 8041<br>✦ <strong style="color:#00FF64">Email:</strong> corporativoglobaljuss@gmail.com<br><br>Respondemos en horario de oficina. Para atención inmediata usa este chat. 😊`,opts:['💳 Prefiero pagar ahora','❓ Tengo otra duda']}
+};
+
+function toggleTFChat(){
+  tfOpen=!tfOpen;
+  const win=document.getElementById('tf-chat');
+  win.classList.toggle('open',tfOpen);
+  if(tfOpen && tfMsgs===0) setTimeout(()=>tfShowTyping(()=>tfAddBot(tfR.bienvenida)),600);
+}
+
+function tfAddBot(r){
+  const msgs=document.getElementById('tf-messages');
+  const opts=document.getElementById('tf-options');
+  tfMsgs++;
+  const div=document.createElement('div');
+  div.className='tf-msg tf-bot';
+  div.innerHTML=`<div style="font-size:.65rem;color:#00FF64;font-weight:700;margin-bottom:4px;letter-spacing:1px;">🚀 TOKENFUN BOT</div>${r.msg}`;
+  msgs.appendChild(div);
+  if(r.paypal){
+    const pp=document.createElement('a');
+    pp.href=TF_PAYPAL; pp.target='_blank';
+    pp.style.cssText='display:block;padding:12px;margin:8px 0;background:linear-gradient(135deg,#003087,#009cde);color:#fff;border-radius:8px;font-weight:700;font-size:.85rem;text-decoration:none;text-align:center;box-shadow:0 4px 16px rgba(0,156,222,.4);';
+    pp.innerHTML='💳 Pagar $50 USD con PayPal →';
+    msgs.appendChild(pp);
+  }
+  opts.innerHTML='';
+  if(r.opts && r.opts.length>0){
+    r.opts.forEach(opt=>{
+      const btn=document.createElement('button');
+      btn.className='tf-opt'; btn.textContent=opt;
+      btn.onclick=()=>tfHandleOpt(opt);
+      opts.appendChild(btn);
+    });
+  }
+  msgs.scrollTop=msgs.scrollHeight;
+}
+
+function tfShowTyping(cb){
+  const msgs=document.getElementById('tf-messages');
+  const t=document.createElement('div');
+  t.className='tf-msg tf-bot tf-typing'; t.id='tf-typing';
+  t.innerHTML='<span></span><span></span><span></span>';
+  msgs.appendChild(t); msgs.scrollTop=msgs.scrollHeight;
+  setTimeout(()=>{const el=document.getElementById('tf-typing');if(el)el.remove();cb();},1200);
+}
+
+function tfAddUser(text){
+  const msgs=document.getElementById('tf-messages');
+  const div=document.createElement('div');
+  div.className='tf-msg tf-user'; div.textContent=text;
+  msgs.appendChild(div); msgs.scrollTop=msgs.scrollHeight;
+}
+
+function tfHandleOpt(opt){
+  document.getElementById('tf-options').innerHTML='';
+  tfAddUser(opt);
+  const o=opt.toLowerCase();
+  let r=tfR.bienvenida;
+  if(o.includes('cómo')||o.includes('como')||o.includes('lanzo')) r=tfR.como;
+  else if(o.includes('cuesta')||o.includes('precio')||o.includes('cuánto')) r=tfR.precio;
+  else if(o.includes('seguro')||o.includes('confiable')) r=tfR.seguro;
+  else if(o.includes('tfn')||o.includes('token oficial')) r=tfR.tfn;
+  else if(o.includes('experiencia')||o.includes('técnica')||o.includes('necesito')) r=tfR.experiencia;
+  else if(o.includes('pagar')||o.includes('lanzar ahora')||o.includes('paypal')||o.includes('comprar')) r=tfR.pagar;
+  else if(o.includes('contactar')||o.includes('hablar')||o.includes('soporte')) r=tfR.contacto;
+  setTimeout(()=>tfShowTyping(()=>tfAddBot(r)),300);
+}
+
+function tfSend(){
+  const input=document.getElementById('tf-input');
+  const text=input.value.trim(); if(!text) return;
+  input.value='';
+  document.getElementById('tf-options').innerHTML='';
+  tfAddUser(text);
+  const t=text.toLowerCase();
+  let r=tfR.bienvenida;
+  if(t.includes('precio')||t.includes('costo')||t.includes('cuanto')) r=tfR.precio;
+  else if(t.includes('seguro')||t.includes('confiable')) r=tfR.seguro;
+  else if(t.includes('como')||t.includes('lanzar')||t.includes('funciona')) r=tfR.como;
+  else if(t.includes('tfn')||t.includes('token oficial')||t.includes('invertir')) r=tfR.tfn;
+  else if(t.includes('experiencia')||t.includes('tecnico')||t.includes('codigo')) r=tfR.experiencia;
+  else if(t.includes('pagar')||t.includes('comprar')||t.includes('paypal')) r=tfR.pagar;
+  else if(t.includes('contacto')||t.includes('whatsapp')||t.includes('email')) r=tfR.contacto;
+  setTimeout(()=>tfShowTyping(()=>tfAddBot(r)),300);
+}
+
+// Auto abrir a los 10 segundos
+setTimeout(()=>{ if(!tfOpen) toggleTFChat(); }, 10000);
+</script>
+
+</body>
+</html>
